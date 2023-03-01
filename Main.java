@@ -1,24 +1,92 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Scanner;
 
 public class Main {
-    //У программиста Васи на подоконнике растёт кактус. Вася постоянно забываетего поливать, поэтому он купил датчик
-    // влажности и решил составить программу для отслеживания времени полива.На вход программа ждет дату последнего
-    // полива кактуса. Если сейчас зима(декабрь - февраль), то кактус поливается раз в месяц. Если осень или весна -
-    // раз в неделю. Летом поливается в зависимости от влажности воздуха, но не чаще одного раза в два дня. Значение
-    // влажности воздуха в программу попадает автоматически от датчика (реализуйте через вызов метода класса Датчик,
-    // внутри которого будет генерация рандомного числа). Если влажность меньше 30%, кактус нужно полить.Вася ожидает от
-    // программы, что после проверки всех данных, она выведет ему сообщение с датой, когда надо поливать кактус.
-    // Реализуйте программу, используя принципы ООП и библиотеки для работы с датой
-    public static void main(String[] args) throws IOException, ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Date dateOfLastWatering = sdf.parse(br.readLine());
-        Date dateCurrent = new Date();
-    }
+    public static void main(String[] args)  {
 
+        Scanner scanner = new Scanner(System.in);
+        long diffMonth;
+        long diffWeek;
+        long diffDay;
+        double humidity;
+
+        System.out.println("Ввод даты последнего полива");
+        System.out.println("Введите год: ");
+        int yearLastHumidity = scanner.nextInt();
+
+        System.out.println("Введите месяц: ");
+        int monthLastHumidity = scanner.nextInt();
+
+        System.out.println("Введите дату: ");
+        int dateLastHumidity = scanner.nextInt();
+
+        LocalDate today = LocalDate.now(); //Считываем текущую дату
+//        today = LocalDate.of(2022, 12, 15); //Проверка для зимы
+//        today = LocalDate.of(2022, 03, 15); //Проверка для весны
+//        today = LocalDate.of(2022, 06, 15); //Проверка для лета
+//        today = LocalDate.of(2022, 09, 15); //Проверка для осени
+
+        LocalDate dateOfLastWatering = LocalDate.of(yearLastHumidity, monthLastHumidity, dateLastHumidity);
+
+        switch (today.getMonthValue()) {
+            case 12, 1, 2 ->{
+                diffMonth = ChronoUnit.MONTHS.between(dateOfLastWatering, today);
+                if (diffMonth > 1) {
+                    System.out.println("Текущая дата : " + today + ", зима. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло " + diffMonth + " месяцев. Вам пора полить кактус!");
+                } else {
+                    if (diffMonth >= 0) {
+                        System.out.println("Текущая дата : " + today + ", зима. Дата последнего полива : " +
+                                dateOfLastWatering + ", прошло меньше месяца. Полейте кактус " +
+                                dateOfLastWatering.plusMonths(1) + "!");
+                    }
+                }
+            }
+            case 3, 4, 5 ->{
+                diffWeek = ChronoUnit.WEEKS.between(dateOfLastWatering, today);
+                if (diffWeek > 1) {
+                    System.out.println("Текущая дата : " + today + ", весна. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло " + diffWeek + " недель. Вам пора полить кактус!");
+                } else {
+                    System.out.println("Текущая дата : " + today + ", весна. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло меньше недели. Полейте кактус " +
+                            dateOfLastWatering.plusWeeks(1)  + "!");
+                }
+            }
+            case 9, 10, 11 ->{
+                diffWeek = ChronoUnit.WEEKS.between(dateOfLastWatering, today);
+                if (diffWeek > 1) {
+                    System.out.println("Текущая дата : " + today + ", осень. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло " + diffWeek + " недель. Вам пора полить кактус!");
+                } else {
+                    System.out.println("Текущая дата : " + today + ", осень. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло меньше недели. Полейте кактус " +
+                            dateOfLastWatering.plusWeeks(1) + "!");
+                }
+            }
+            case 6, 7, 8 ->{
+                diffDay = ChronoUnit.DAYS.between(dateOfLastWatering, today);
+                if (diffDay >= 2) {
+                    System.out.println("Текущая дата : " + today + ", лето. Дата последнего полива : " +
+                            dateOfLastWatering + ", прошло " + diffDay + " дней. Вам пора полить кактус!");
+                } else {
+                    HumiditySensor humiditySensor = new HumiditySensor();
+                    humidity = humiditySensor.getHumidity();
+                    if (humidity >= 30) {
+                        System.out.println("Текущая дата : " + today + ", лето. Дата последнего полива : " +
+                                dateOfLastWatering + ", прошло меньше 2-х дней и влажность = " +
+                                String.format("%.2f",humidity) + ", это больше 30%. Полейте кактус " +
+                                dateOfLastWatering.plusDays(2) + "!");
+                    } else {
+                        System.out.println("Текущая дата : " + today + ", лето. Дата последнего полива : " +
+                                dateOfLastWatering + ", прошло меньше 2-х дней, но влажность = " +
+                                String.format("%.2f",humidity) + ", это меньше 30%. Полейте кактус!");
+
+                    }
+                }
+            }
+        }
+
+    }
 }
